@@ -1,24 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 function App() {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/tasks")
+      .then(function (response) {
+        // handle success
+        setTasks(response.data);
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {tasks.map((task) => (
+        <div key={task.id}>
+          <h1>{task.title}</h1>
+          <p>{task.description}</p>
+          {task.completed && <p style={{ color: "#347814" }}>Completado</p>}
+        </div>
+      ))}
     </div>
   );
 }
