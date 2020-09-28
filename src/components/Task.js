@@ -1,27 +1,25 @@
 import React from "react";
 import styled from "styled-components";
+import { ReactComponent as MoreHoriz } from "../icons/more_horiz.svg";
 
 const TaskContainer = styled.div`
-  width: 100%;
-  height: 3em;
+  width: 99%;
+  min-height: 4rem;
+  height: auto;
   display: flex;
-  align-items: center;
-  margin-bottom: 0.4em;
-
-  background-color: #222223;
-  border-radius: 15px;
+  margin-bottom: 0.8rem;
+  background-color: #fff;
+  border: 1.2px solid #e2e6ee;
+  border-radius: 10px;
 `;
 
-const Title = styled.div`
+const Title = styled.p`
   font-family: Montserrat;
-  font-size: 0.8em;
+  font-weight: 500;
+  font-size: 0.7rem;
   margin: auto;
-  width: 85%;
-  text-decoration: ${(props) => (props.isCompleted ? "line-through" : "none")};
-  color: ${(props) =>
-    props.isCompleted
-      ? "rgba(255, 255, 255, 0.38)"
-      : "rgba(255, 255, 255, 0.6)"};
+  width: 65%;
+  color: #000;
 `;
 
 const CheckboxWrapper = styled.label`
@@ -40,16 +38,13 @@ const StyledCheckbox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 0.8em;
-  width: 0.8em;
+  height: 0.8rem;
+  width: 0.8rem;
   background-color: ${(props) =>
-    props.isCompleted ? "rgba(255, 255, 255, 0.8)" : "transparent"};
-  border-radius: 50%;
-  border: ${(props) =>
-    props.isCompleted
-      ? "1px solid rgba(255, 255, 255, 0.8)"
-      : "1px solid rgba(255, 255, 255, 0.6)"};
-  margin-left: 0.5em;
+    props.completed ? props.main_color : "transparent"};
+  border-radius: 25%;
+  border: 1px solid ${(props) => props.main_color};
+  margin-left: 0.8rem;
 `;
 
 const HiddenCheckbox = styled.input.attrs({ type: "checkbox" })`
@@ -58,18 +53,46 @@ const HiddenCheckbox = styled.input.attrs({ type: "checkbox" })`
   cursor: pointer;
 `;
 
-export default function Task({ id, title, isCompleted, handleChange }) {
+const EditButton = styled.button`
+  width: 20%;
+  border: none;
+  background-color: transparent;
+  color: #bb86fc;
+  font-family: Montserrat;
+  font-size: 0.6rem;
+`;
+
+const Checkmark = styled.span`
+  font-size: 0.5rem;
+  color: #fff;
+`;
+
+export default function Task({ task, handleChange, onEditClick, category }) {
+  const { completed, title, _id } = task;
+
+  const renderTitle = (title) => {
+    if (title.length >= 40) {
+      return title.slice(0, 37) + "...";
+    }
+    return title;
+  };
   return (
-    <TaskContainer>
+    <TaskContainer completed={completed} main_color={category.main_color}>
       <CheckboxWrapper>
-        <StyledCheckbox isCompleted={isCompleted}>
-          {isCompleted && (
-            <span style={{ fontSize: "0.5em", color: " #222223" }}>✓</span>
-          )}
+        <StyledCheckbox completed={completed} main_color={category.main_color}>
+          {completed && <Checkmark>✓</Checkmark>}
         </StyledCheckbox>
-        <HiddenCheckbox checked={isCompleted} onChange={handleChange(id)} />
+        <HiddenCheckbox checked={completed} onChange={handleChange(_id)} />
       </CheckboxWrapper>
-      <Title isCompleted={isCompleted}>{title}</Title>
+      <Title completed={completed}>{renderTitle(title)}</Title>
+      <EditButton onClick={() => onEditClick(task)}>
+        <MoreHoriz
+          style={{
+            fill: `${category.main_color}`,
+            cursor: "pointer",
+          }}
+        />
+      </EditButton>
     </TaskContainer>
   );
 }
