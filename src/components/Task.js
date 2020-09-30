@@ -85,7 +85,7 @@ export default function Task({
   category,
 }) {
   const [selected, setselected] = useState(false);
-  const { completed, title, _id } = task;
+  const { completed, title } = task;
 
   const onLongPress = () => {
     setselected(!selected);
