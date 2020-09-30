@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Task from "./Task";
 import styled from "styled-components";
-import NewTaskForm from "./NewTaskForm";
-import TaskDetail from "./TaskDetail";
+import AddTask from "./AddTask";
+import EditTask from "./EditTask";
 import handleViewport from "react-in-viewport";
 import AddButton from "./AddButton";
+import ConfirmDelete from "./ConfirmDelete";
 
 const TaskListContainer = styled.div`
   font-family: Montserrat;
@@ -65,10 +66,12 @@ export default function TaskList({ category }) {
   const [isLoading, setisLoading] = useState(true);
   const [createTaskForm, setcreateTaskForm] = useState(false);
   const [editTaskForm, setEditTaskForm] = useState(false);
-  const [tasks, setTasks] = useState([]);
+  const [tasksList, setTasksList] = useState([]);
   const [upAddbutton, setupAddbutton] = useState(false);
   const [downAddbutton, setdownAddbutton] = useState(true);
   const [taskToEdit, setTaskToEdit] = useState(null);
+  const [confirmWindow, setConfirmWindow] = useState(false);
+  const [taskToDelete, settaskToDelete] = useState(null);
 
   const showUpAddbutton = () => {
     setupAddbutton(true);
@@ -84,21 +87,9 @@ export default function TaskList({ category }) {
     setcreateTaskForm(true);
   };
 
-  useEffect(() => {
-    if (category._id) {
-      axios
-        .get(`/tasks/category=${category._id}`)
-        .then(function (response) {
-          // handle success
-          setTasks(response.data);
-          setisLoading(false);
-        })
-        .catch(function (error) {
-          // handle error
-          console.log(error);
-        });
-    }
-  }, [category._id]);
+  const closeConfirmWindow = () => {
+    setConfirmWindow(false);
+  };
 
   useEffect(() => {
     if (category._id) {
@@ -106,7 +97,7 @@ export default function TaskList({ category }) {
         .get(`/tasks/category=${category._id}`)
         .then(function (response) {
           // handle success
-          setTasks(response.data);
+          setTasksList(response.data);
           setisLoading(false);
         })
         .catch(function (error) {
@@ -124,6 +115,11 @@ export default function TaskList({ category }) {
     setEditTaskForm(false);
   };
 
+  const openConfirmDelete = (task) => {
+    settaskToDelete(task);
+    setConfirmWindow(!confirmWindow);
+  };
+
   const deleteTask = (id) => {
     const config = {
       headers: {
@@ -134,8 +130,8 @@ export default function TaskList({ category }) {
     axios
       .delete(`/tasks/${id}`, config)
       .then(function (response) {
-        setTasks(tasks.filter((task) => id !== task._id));
-        setEditTaskForm(false);
+        setTasksList(tasksList.filter((task) => id !== task._id));
+        setConfirmWindow(false);
       })
       .catch(function (error) {
         // handle error
@@ -143,7 +139,7 @@ export default function TaskList({ category }) {
       });
   };
 
-  const handleCreateSubmit = (data) => (e) => {
+  const addTask = (data) => (e) => {
     e.preventDefault();
 
     const config = {
@@ -158,7 +154,7 @@ export default function TaskList({ category }) {
     axios
       .post(`/tasks`, body, config)
       .then(function (response) {
-        setTasks([...tasks, response.data]);
+        setTasksList([...tasksList, response.data]);
         setcreateTaskForm(false);
       })
       .catch(function (error) {
@@ -167,7 +163,7 @@ export default function TaskList({ category }) {
       });
   };
 
-  const handleTaskComplete = (id) => (event) => {
+  const completeTask = (id) => (event) => {
     const config = {
       headers: {
         "Content-type": "application/json",
@@ -184,8 +180,8 @@ export default function TaskList({ category }) {
     axios
       .patch(`/tasks/${id}`, body, config)
       .then(function (response) {
-        setTasks(
-          tasks.map((task) =>
+        setTasksList(
+          tasksList.map((task) =>
             task._id === response.data._id ? response.data : task
           )
         );
@@ -196,7 +192,7 @@ export default function TaskList({ category }) {
       });
   };
 
-  const handleEditSubmit = (data) => (e) => {
+  const editTask = (data) => (e) => {
     e.preventDefault();
 
     const config = {
@@ -211,8 +207,8 @@ export default function TaskList({ category }) {
     axios
       .patch(`/tasks/${data.id}`, body, config)
       .then(function (response) {
-        setTasks(
-          tasks.map((task) =>
+        setTasksList(
+          tasksList.map((task) =>
             task._id === response.data._id ? response.data : task
           )
         );
@@ -224,16 +220,16 @@ export default function TaskList({ category }) {
       });
   };
 
-  const onEditClick = (task) => {
+  const openEditForm = (task) => {
     setEditTaskForm(true);
     setTaskToEdit(task);
   };
 
   if (createTaskForm) {
     return (
-      <NewTaskForm
+      <AddTask
         handleCancel={closeCreateForm}
-        handleSubmit={handleCreateSubmit}
+        handleSubmit={addTask}
         category={category}
       />
     );
@@ -241,11 +237,11 @@ export default function TaskList({ category }) {
 
   if (editTaskForm) {
     return (
-      <TaskDetail
+      <EditTask
         handleCancel={closeEditForm}
-        handleSubmit={handleEditSubmit}
-        handleDelete={deleteTask}
+        handleSubmit={editTask}
         task={taskToEdit}
+        category={category}
       />
     );
   }
@@ -274,13 +270,14 @@ export default function TaskList({ category }) {
       <ListContainer>
         {isLoading && <p>Getting Tasks</p>}
 
-        {tasks.map((task) => (
+        {tasksList.map((task) => (
           <Task
             category={category}
             key={task._id}
-            handleChange={handleTaskComplete}
+            handleChange={completeTask}
             task={task}
-            onEditClick={onEditClick}
+            openEditForm={openEditForm}
+            handleDelete={openConfirmDelete}
           />
         ))}
         <ViewportButton
@@ -291,6 +288,13 @@ export default function TaskList({ category }) {
           openCreateForm={openCreateForm}
         />
       </ListContainer>
+      {confirmWindow && (
+        <ConfirmDelete
+          handleClose={closeConfirmWindow}
+          task={taskToDelete}
+          handleConfirm={deleteTask}
+        />
+      )}
     </TaskListContainer>
   );
 }

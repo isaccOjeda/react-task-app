@@ -10,7 +10,7 @@ const MainWrapper = styled.div`
   overflow: hidden;
 `;
 
-export default function Dashboard() {
+export default function HomeScreen() {
   const [categorySelected, setcategorySelected] = useState({});
 
   const memoizedSelectCategory = useCallback((category) => {

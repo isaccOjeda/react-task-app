@@ -34,7 +34,7 @@ const NavItem = styled.div`
   width: 1.8rem;
   background-color: ${(props) =>
     props.isSelected ? props.main_color : "#353943"};
-  margin: 0.5rem 0;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -121,7 +121,7 @@ const CategoryNameContainer = styled.div`
   width: 50%;
   margin-left: 0.8rem;
 `;
-export default function NewTaskForm({ handleCancel, handleSubmit, category }) {
+export default function AddTask({ handleCancel, handleSubmit, category }) {
   const [values, setValues] = useState({
     title: "",
     category: category._id,
@@ -146,12 +146,13 @@ export default function NewTaskForm({ handleCancel, handleSubmit, category }) {
           }}
         />
 
-        <Title>Create new Task</Title>
+        <Title>Create New Task</Title>
       </HeaderContainer>
 
       <Form onSubmit={handleSubmit(values)}>
         <InputContainer>
           <TextInput
+            autoFocus
             main_color={category.main_color}
             onChange={handleChange}
             name="title"

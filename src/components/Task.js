@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { ReactComponent as MoreHoriz } from "../icons/more_horiz.svg";
+import useLongPress from "../hooks/useLongPress";
+import { ReactComponent as EditIcon } from "../icons/edit_icon.svg";
+import { ReactComponent as DeleteIcon } from "../icons/delete_icon.svg";
 
 const TaskContainer = styled.div`
   width: 99%;
@@ -8,7 +10,9 @@ const TaskContainer = styled.div`
   height: auto;
   display: flex;
   margin-bottom: 0.8rem;
-  background-color: #fff;
+  transition: background 0.1s ease;
+  background-color: ${(props) => (props.selected ? props.main_color : "#fff")};
+
   border: 1.2px solid #e2e6ee;
   border-radius: 10px;
 `;
@@ -18,8 +22,8 @@ const Title = styled.p`
   font-weight: 500;
   font-size: 0.7rem;
   margin: auto;
-  width: 65%;
-  color: #000;
+  width: 55%;
+  color: ${(props) => (props.selected ? "#fff" : "#000")};
 `;
 
 const CheckboxWrapper = styled.label`
@@ -41,7 +45,7 @@ const StyledCheckbox = styled.div`
   height: 0.8rem;
   width: 0.8rem;
   background-color: ${(props) =>
-    props.completed ? props.main_color : "transparent"};
+    props.completed ? (props.selected ? "#fff" : props.main_color) : "#fff"};
   border-radius: 25%;
   border: 1px solid ${(props) => props.main_color};
   margin-left: 0.8rem;
@@ -64,11 +68,44 @@ const EditButton = styled.button`
 
 const Checkmark = styled.span`
   font-size: 0.5rem;
-  color: #fff;
+  color: ${(props) => (props.selected ? props.main_color : "#fff")};
 `;
 
-export default function Task({ task, handleChange, onEditClick, category }) {
+const MenuContainer = styled.div`
+  display: ${(props) => (props.selected ? "flex" : "hidden")};
+  width: 30%;
+  justify-content: space-evenly;
+`;
+
+export default function Task({
+  task,
+  handleChange,
+  openEditForm,
+  handleDelete,
+  category,
+}) {
+  const [selected, setselected] = useState(false);
   const { completed, title, _id } = task;
+
+  const onLongPress = () => {
+    setselected(!selected);
+  };
+
+  const onTaskClick = (task) => {
+    return;
+  };
+
+  const defaultOptions = {
+    shouldPreventDefault: true,
+    delay: 500,
+  };
+
+  const longPressEvent = useLongPress(
+    onLongPress,
+    onTaskClick,
+    defaultOptions,
+    task
+  );
 
   const renderTitle = (title) => {
     if (title.length >= 40) {
@@ -77,22 +114,49 @@ export default function Task({ task, handleChange, onEditClick, category }) {
     return title;
   };
   return (
-    <TaskContainer completed={completed} main_color={category.main_color}>
+    <TaskContainer
+      completed={completed}
+      main_color={category.main_color}
+      {...longPressEvent}
+      selected={selected}
+    >
       <CheckboxWrapper>
-        <StyledCheckbox completed={completed} main_color={category.main_color}>
-          {completed && <Checkmark>✓</Checkmark>}
+        <StyledCheckbox
+          selected={selected}
+          completed={completed}
+          main_color={category.main_color}
+        >
+          {completed && (
+            <Checkmark main_color={category.main_color} selected={selected}>
+              ✓
+            </Checkmark>
+          )}
         </StyledCheckbox>
-        <HiddenCheckbox checked={completed} onChange={handleChange(_id)} />
+        <HiddenCheckbox checked={completed} onChange={handleChange(task._id)} />
       </CheckboxWrapper>
-      <Title completed={completed}>{renderTitle(title)}</Title>
-      <EditButton onClick={() => onEditClick(task)}>
-        <MoreHoriz
-          style={{
-            fill: `${category.main_color}`,
-            cursor: "pointer",
-          }}
-        />
-      </EditButton>
+      <Title selected={selected} completed={completed}>
+        {renderTitle(title)}
+      </Title>
+      <MenuContainer selected={selected}>
+        <EditButton onClick={() => openEditForm(task)}>
+          <EditIcon
+            style={{
+              fill: `${selected ? "#fff" : "transparent"}`,
+              cursor: "pointer",
+              width: "1rem",
+            }}
+          />
+        </EditButton>
+        <EditButton onClick={() => handleDelete(task)}>
+          <DeleteIcon
+            style={{
+              fill: `${selected ? "#fff" : "transparent"}`,
+              cursor: "pointer",
+              width: "1rem",
+            }}
+          />
+        </EditButton>
+      </MenuContainer>
     </TaskContainer>
   );
 }
