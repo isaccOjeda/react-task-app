@@ -82,7 +82,7 @@ export default function Task({
   handleChange,
   openEditForm,
   handleDelete,
-  category,
+  task_list,
 }) {
   const [selected, setselected] = useState(false);
   const { completed, title } = task;
@@ -116,7 +116,7 @@ export default function Task({
   return (
     <TaskContainer
       completed={completed}
-      main_color={category.main_color}
+      main_color={task_list.main_color}
       {...longPressEvent}
       selected={selected}
     >
@@ -124,10 +124,10 @@ export default function Task({
         <StyledCheckbox
           selected={selected}
           completed={completed}
-          main_color={category.main_color}
+          main_color={task_list.main_color}
         >
           {completed && (
-            <Checkmark main_color={category.main_color} selected={selected}>
+            <Checkmark main_color={task_list.main_color} selected={selected}>
               ✓
             </Checkmark>
           )}

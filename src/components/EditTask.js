@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { ReactComponent as ArrowBack } from "../icons/arrow_back.svg";
-import { ReactComponent as WorkCategoryIcon } from "../icons/work_category_icon.svg";
+import { ReactComponent as WorkTaskListIcon } from "../icons/work_task_list_icon.svg";
 
 const MainContainer = styled.div`
   font-family: Montserrat;
@@ -101,7 +101,7 @@ const SectionContainer = styled.div`
   margin-bottom: 3rem;
 `;
 
-const CategoryIconContainer = styled.div`
+const TaskListIconContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,11 +113,11 @@ const CategoryIconContainer = styled.div`
   border-radius: 25%;
 `;
 
-const CategoryName = styled.p`
+const TaskListName = styled.p`
   font-size: 0.8rem;
   font-weight: 600;
 `;
-const CategoryNameContainer = styled.div`
+const TaskListNameContainer = styled.div`
   width: 50%;
   margin-left: 0.8rem;
 `;
@@ -126,7 +126,7 @@ export default function EditTask({
   handleCancel,
   handleSubmit,
   task,
-  category,
+  task_list,
 }) {
   const [values, setValues] = useState({
     id: task._id,
@@ -159,7 +159,7 @@ export default function EditTask({
       <Form onSubmit={handleSubmit(values)}>
         <InputContainer>
           <TextInput
-            main_color={category.main_color}
+            main_color={task_list.main_color}
             onChange={handleChange}
             name="title"
             value={values.title}
@@ -169,12 +169,12 @@ export default function EditTask({
         </InputContainer>
 
         <SectionContainer>
-          <CategoryIconContainer light_color={category.light_color}>
-            <WorkCategoryIcon style={{ fill: `${category.main_color}` }} />
-          </CategoryIconContainer>
-          <CategoryNameContainer>
-            <CategoryName>{category.name}</CategoryName>
-          </CategoryNameContainer>
+          <TaskListIconContainer light_color={task_list.light_color}>
+            <WorkTaskListIcon style={{ fill: `${task_list.main_color}` }} />
+          </TaskListIconContainer>
+          <TaskListNameContainer>
+            <TaskListName>{task_list.name}</TaskListName>
+          </TaskListNameContainer>
         </SectionContainer>
 
         <SubmitButton type="submit">EDIT</SubmitButton>

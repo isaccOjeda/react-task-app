@@ -26,7 +26,7 @@ const HeaderContainer = styled.div`
   justify-content: flex-start;
 `;
 
-const CategoryName = styled.h2`
+const TaskListName = styled.h2`
   width: 80%;
   margin-top: 1rem;
   font-weight: 700;
@@ -62,7 +62,7 @@ const StyledButton = styled.button`
 
 const ViewportButton = handleViewport(AddButton);
 
-export default function TaskList({ category }) {
+export default function Tasks({ task_list }) {
   const [isLoading, setisLoading] = useState(true);
   const [createTaskForm, setcreateTaskForm] = useState(false);
   const [editTaskForm, setEditTaskForm] = useState(false);
@@ -92,9 +92,16 @@ export default function TaskList({ category }) {
   };
 
   useEffect(() => {
-    if (category._id) {
+    if (task_list._id) {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          "auth-token": `${localStorage.getItem("token")}`,
+        },
+      };
+
       axios
-        .get(`/tasks/category=${category._id}`)
+        .get(`/tasks/task_list=${task_list._id}`, config)
         .then(function (response) {
           // handle success
           setTasksList(response.data);
@@ -105,7 +112,7 @@ export default function TaskList({ category }) {
           console.log(error);
         });
     }
-  }, [category._id]);
+  }, [task_list._id]);
 
   const closeCreateForm = () => {
     setcreateTaskForm(false);
@@ -124,6 +131,7 @@ export default function TaskList({ category }) {
     const config = {
       headers: {
         "Content-type": "application/json",
+        "auth-token": `${localStorage.getItem("token")}`,
       },
     };
 
@@ -145,6 +153,7 @@ export default function TaskList({ category }) {
     const config = {
       headers: {
         "Content-type": "application/json",
+        "auth-token": `${localStorage.getItem("token")}`,
       },
     };
 
@@ -167,6 +176,7 @@ export default function TaskList({ category }) {
     const config = {
       headers: {
         "Content-type": "application/json",
+        "auth-token": `${localStorage.getItem("token")}`,
       },
     };
 
@@ -198,6 +208,7 @@ export default function TaskList({ category }) {
     const config = {
       headers: {
         "Content-type": "application/json",
+        "auth-token": `${localStorage.getItem("token")}`,
       },
     };
 
@@ -230,7 +241,7 @@ export default function TaskList({ category }) {
       <AddTask
         handleCancel={closeCreateForm}
         handleSubmit={addTask}
-        category={category}
+        task_list={task_list}
       />
     );
   }
@@ -241,7 +252,7 @@ export default function TaskList({ category }) {
         handleCancel={closeEditForm}
         handleSubmit={editTask}
         task={taskToEdit}
-        category={category}
+        task_list={task_list}
       />
     );
   }
@@ -257,9 +268,9 @@ export default function TaskList({ category }) {
             justifyContent: "space-between",
           }}
         >
-          <CategoryName>{category.name} </CategoryName>
+          <TaskListName>{task_list.name} </TaskListName>
           <StyledButton
-            main_color={category.main_color}
+            main_color={task_list.main_color}
             isVisible={upAddbutton}
             onClick={() => setcreateTaskForm(true)}
           >
@@ -272,7 +283,7 @@ export default function TaskList({ category }) {
 
         {tasksList.map((task) => (
           <Task
-            category={category}
+            task_list={task_list}
             key={task._id}
             handleChange={completeTask}
             task={task}
@@ -281,7 +292,7 @@ export default function TaskList({ category }) {
           />
         ))}
         <ViewportButton
-          main_color={category.main_color}
+          main_color={task_list.main_color}
           isVisible={downAddbutton}
           onEnterViewport={() => showDownAddbutton()}
           onLeaveViewport={() => showUpAddbutton()}

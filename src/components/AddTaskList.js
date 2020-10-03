@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { ReactComponent as ArrowBack } from "../icons/arrow_back.svg";
-import { ReactComponent as WorkTaskListIcon } from "../icons/work_task_list_icon.svg";
+import ColorPicker from "./ColorPicker";
 
 const FormContainer = styled.div`
   font-family: Montserrat;
@@ -17,7 +17,7 @@ const FormContainer = styled.div`
   box-sizing: border-box;
   padding: 0 1.5em;
   height: 100%;
-  background-color: #fff;
+  background-color: #1d1e1f;
 `;
 
 const HeaderContainer = styled.div`
@@ -29,50 +29,11 @@ const HeaderContainer = styled.div`
 `;
 
 const Title = styled.h1`
-  width: 70%;
+  width: 80%;
   margin-top: 1rem;
   font-weight: 500;
   letter-spacing: 0.1rem;
-`;
-
-const TextInput = styled.input.attrs({ type: "text" })`
-  height: 3rem;
-  width: 100%;
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box; /* Firefox, other Gecko */
-  box-sizing: border-box;
-  background-color: transparent;
-  color: #56545b;
-  border: none;
-  padding-left: 1rem;
-  border-bottom: 1px solid #56545b;
-  caret-color: #56545b;
-
-  &:focus {
-    border-bottom: 2px solid ${(props) => props.main_color};
-    color: #000;
-  }
-
-  &:focus + label {
-    color: ${(props) => props.main_color};
-    font-weight: bold;
-  }
-`;
-
-const InputLabel = styled.label`
-  color: #c6cad8;
-  font-size: 0.8rem;
-`;
-
-const SubmitButton = styled.button`
-  width: 100%;
-  background-color: #1d1e1f;
-  height: 3rem;
-  border-radius: 12px;
-  cursor: pointer;
-  border: none;
-  color: #fff;
-  margin-bottom: 2em;
+  color: white;
 `;
 
 const Form = styled.form`
@@ -88,43 +49,52 @@ const InputContainer = styled.div`
   margin-bottom: 2rem;
 `;
 
-const SectionContainer = styled.div`
+const TextInput = styled.input.attrs({ type: "text" })`
+  height: 3rem;
   width: 100%;
-  height: 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-bottom: 0.8rem;
-  background-color: #fff;
-  border: 1.2px solid #e2e6ee;
-  border-radius: 15px;
-  margin-bottom: 3rem;
-`;
-
-const TaskListIconContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 2.3rem;
-  width: 2.3rem;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box; /* Firefox, other Gecko */
+  box-sizing: border-box;
+  background-color: transparent;
+  color: #999;
   border: none;
-  background-color: ${(props) => props.light_color};
-  margin-left: 0.8rem;
-  border-radius: 25%;
+  padding-left: 1rem;
+  border-bottom: 1px solid #56545b;
+  caret-color: #56545b;
+
+  &:focus {
+    border-bottom: 2px solid ${(props) => props.main_color};
+    color: white;
+  }
+
+  &:focus + label {
+    color: ${(props) => props.main_color};
+  }
 `;
 
-const TaskListName = styled.p`
+const InputLabel = styled.label`
+  color: #999;
   font-size: 0.8rem;
-  font-weight: 600;
 `;
-const TaskListNameContainer = styled.div`
-  width: 50%;
-  margin-left: 0.8rem;
+
+const SubmitButton = styled.button`
+  font-family: Montserrat;
+  width: 100%;
+  background-color: ${(props) => props.main_color};
+  height: 3rem;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  margin-bottom: 2em;
 `;
-export default function AddTask({ handleCancel, handleSubmit, task_list }) {
+
+export default function AddTaskList({ handleCancel, onSubmit }) {
   const [values, setValues] = useState({
-    title: "",
-    task_list: task_list._id,
+    name: "",
+    main_color: "#A362EA",
+    dark_color: "#502583",
+    light_color: "#F5EEFD",
   });
 
   const handleChange = (e) => {
@@ -134,41 +104,46 @@ export default function AddTask({ handleCancel, handleSubmit, task_list }) {
     });
   };
 
+  const handleColorChange = (color) => {
+    setValues({
+      ...values,
+      main_color: color.main_color,
+      dark_color: color.dark_color,
+      light_color: color.light_color,
+    });
+  };
+
   return (
     <FormContainer>
       <HeaderContainer>
         <ArrowBack
           onClick={handleCancel}
           style={{
-            fill: "black",
+            fill: "white",
             cursor: "pointer",
             marginTop: "1.5rem",
           }}
         />
-
-        <Title>Create New Task</Title>
+        <Title>Create New Task List</Title>
       </HeaderContainer>
-
-      <Form onSubmit={handleSubmit(values)}>
+      <Form onSubmit={onSubmit(values)}>
         <InputContainer>
           <TextInput
+            main_color={values.main_color}
             autoFocus
-            main_color={task_list.main_color}
             onChange={handleChange}
-            name="title"
-            value={values.title}
+            name="name"
+            value={values.name}
           />
-          <InputLabel htmlFor="title">Task name</InputLabel>
+          <InputLabel htmlFor="name">List Name</InputLabel>
         </InputContainer>
-        <SectionContainer>
-          <TaskListIconContainer light_color={task_list.light_color}>
-            <WorkTaskListIcon style={{ fill: `${task_list.main_color}` }} />
-          </TaskListIconContainer>
-          <TaskListNameContainer>
-            <TaskListName>{task_list.name}</TaskListName>
-          </TaskListNameContainer>
-        </SectionContainer>
-        <SubmitButton type="submit">CREATE TASK</SubmitButton>
+        <InputContainer>
+          .
+          <ColorPicker handleColorChange={handleColorChange} values={values} />
+        </InputContainer>
+        <SubmitButton main_color={values.main_color} type="submit">
+          CREATE TASK LIST
+        </SubmitButton>
       </Form>
     </FormContainer>
   );

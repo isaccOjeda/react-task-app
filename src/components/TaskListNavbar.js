@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
-import axios from "axios";
+import AddTaskList from "./AddTaskList";
 
 const Navbar = styled.div`
   display: flex;
@@ -46,6 +46,22 @@ const NavItem = styled.div`
     ${(props) => (props.isSelected ? props.dark_color : "#000000")};
 `;
 
+const AddItem = styled.div`
+  height: 1.8rem;
+  width: 1.8rem;
+  background-color: #353943;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 25%;
+  cursor: pointer;
+  -webkit-box-shadow: 0px 1.8px 0px 1px #000000;
+  box-shadow: 0px 1.8px 0px 1px #000000;
+  color: #fff;
+  font-weight: bold;
+`;
+
 const Text = styled.p`
   font-family: Montserrat;
   font-size: 0.6em;
@@ -53,49 +69,48 @@ const Text = styled.p`
   color: ${(props) => (props.isSelected ? "#fff" : props.main_color)};
 `;
 
-export default function CategoryNavbar({ selectCategory, categorySelected }) {
-  const [isLoading, setisLoading] = useState(true);
-  const [categoryList, setcategoryList] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get(`/categories/`)
-      .then(function (response) {
-        // handle success
-        setcategoryList(response.data);
-        selectCategory(response.data[0]);
-        setisLoading(false);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      });
-  }, [selectCategory]);
-
+export default function TaskListNavbar({
+  addTaskList,
+  selectTaskList,
+  taskListSelected,
+  taskList,
+  isLoading,
+  taskListForm,
+  openTaskListForm,
+  closeTaskListForm,
+}) {
   if (isLoading) {
     return <Navbar />;
+  }
+
+  if (taskListForm) {
+    return (
+      <AddTaskList handleCancel={closeTaskListForm} onSubmit={addTaskList} />
+    );
   }
 
   return (
     <Navbar>
       <NavHeaderContainer />
       <NavItemsContainer>
-        {categoryList.map((category) => (
-          <NavItem
-            main_color={category.main_color}
-            dark_color={category.dark_color}
-            isSelected={categorySelected._id === category._id}
-            key={category._id}
-            onClick={() => selectCategory(category)}
-          >
-            <Text
-              main_color={category.main_color}
-              isSelected={categorySelected._id === category._id}
+        {taskList.length > 0 &&
+          taskList.map((task_list) => (
+            <NavItem
+              main_color={task_list.main_color}
+              dark_color={task_list.dark_color}
+              isSelected={taskListSelected._id === task_list._id}
+              key={task_list._id}
+              onClick={() => selectTaskList(task_list)}
             >
-              {category.name.slice(0, 1).toUpperCase()}
-            </Text>
-          </NavItem>
-        ))}
+              <Text
+                main_color={task_list.main_color}
+                isSelected={taskListSelected._id === task_list._id}
+              >
+                {task_list.name.slice(0, 1).toUpperCase()}
+              </Text>
+            </NavItem>
+          ))}
+        <AddItem onClick={openTaskListForm}>+</AddItem>
       </NavItemsContainer>
       <NavFooterContainer />
     </Navbar>
